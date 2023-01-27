@@ -13,7 +13,14 @@ class PriceScreen extends StatefulWidget {
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = 'INR';
   int rate;
-  CoinData coinData = CoinData(selectedCurrency: 'INR');
+  // CoinData coinData = CoinData(selectedCurrency: 'INR');
+
+  Future<int> initialLoad(String value) async {
+    selectedCurrency = value;
+    var coinRate =
+        await CoinData(selectedCurrency: selectedCurrency).getCoinData();
+    return rate = coinRate['rate'].round();
+  }
 
   void updateUI(String value) async {
     selectedCurrency = value;
@@ -23,6 +30,11 @@ class _PriceScreenState extends State<PriceScreen> {
       rate = coinRate['rate'].round();
     });
     return;
+  }
+
+  void initState() {
+    super.initState();
+    updateUI("INR");
   }
 
   CupertinoPicker getIosItems() {
