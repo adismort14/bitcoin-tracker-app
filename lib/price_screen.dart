@@ -20,7 +20,7 @@ class _PriceScreenState extends State<PriceScreen> {
     var coinRate =
         await CoinData(selectedCurrency: selectedCurrency).getCoinData();
     setState(() {
-      rate = coinRate.rate;
+      rate = coinRate['rate'].round();
     });
     return;
   }
