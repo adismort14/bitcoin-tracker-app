@@ -12,23 +12,34 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = 'INR';
-  int rate;
+  List<int> coinValues = [];
+  int BTCrate;
+  int ETHrate;
+  int LTCrate;
+  Map<String, int> coinValue;
   // CoinData coinData = CoinData(selectedCurrency: 'INR');
-
-  Future<int> initialLoad(String value) async {
-    selectedCurrency = value;
-    var coinRate =
-        await CoinData(selectedCurrency: selectedCurrency).getCoinData();
-    return rate = coinRate['rate'].round();
-  }
 
   void updateUI(String value) async {
     selectedCurrency = value;
-    var coinRate =
-        await CoinData(selectedCurrency: selectedCurrency).getCoinData();
+    var BTCcoinRate = await CoinData(
+            selectedCurrency: selectedCurrency, selectedCrypto: "BTC")
+        .getCoinData();
+
+    var ETHcoinRate = await CoinData(
+            selectedCurrency: selectedCurrency, selectedCrypto: "ETH")
+        .getCoinData();
+    var LTCcoinRate = await CoinData(
+            selectedCurrency: selectedCurrency, selectedCrypto: "LTC")
+        .getCoinData();
+
     setState(() {
-      rate = coinRate['rate'].round();
+      BTCrate = BTCcoinRate['rate'].round();
+      ETHrate = ETHcoinRate['rate'].round();
+      LTCrate = LTCcoinRate['rate'].round();
     });
+
+    coinValue = {'BTC': BTCrate, 'ETH': ETHrate, 'LTC': LTCrate};
+
     return;
   }
 
@@ -82,6 +93,34 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 
+  // List<Widget> constructCards() {
+  //   List<Widget> cardWidget = [];
+  //   for (String crypto in cryptoList) {
+  //     var newWidgetItem = Card(
+  //       color: Colors.lightBlueAccent,
+  //       elevation: 5.0,
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(10.0),
+  //       ),
+  //       child: Padding(
+  //         padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+  //         child: Text(
+  //           '1 $crypto = $ETHrate $selectedCurrency',
+  //           textAlign: TextAlign.center,
+  //           style: TextStyle(
+  //             fontSize: 20.0,
+  //             color: Colors.white,
+  //           ),
+  //         ),
+  //       ),
+  //     );
+  //
+  //     cardWidget.add(newWidgetItem);
+  //   }
+  //
+  //   return cardWidget;
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,23 +134,24 @@ class _PriceScreenState extends State<PriceScreen> {
         children: <Widget>[
           Padding(
             padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  '1 BTC = $rate $selectedCurrency',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
+            child: Column(
+              children: [
+                CryptoCard(
+                  cryptoCurrency: "BTC",
+                  value: coinValue['BTC'].toString(),
+                  selectedCurrency: selectedCurrency,
                 ),
-              ),
+                CryptoCard(
+                  cryptoCurrency: "ETH",
+                  value: coinValue['ETH'].toString(),
+                  selectedCurrency: selectedCurrency,
+                ),
+                CryptoCard(
+                  cryptoCurrency: "LTC",
+                  value: coinValue['LTC'].toString(),
+                  selectedCurrency: selectedCurrency,
+                ),
+              ],
             ),
           ),
           Container(
@@ -122,6 +162,44 @@ class _PriceScreenState extends State<PriceScreen> {
             child: Platform.isAndroid ? getAndroidItems() : getIosItems(),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class CryptoCard extends StatelessWidget {
+  //2: You'll need to able to pass the selectedCurrency, value and cryptoCurrency to the constructor of this CryptoCard Widget.
+  const CryptoCard({
+    this.value,
+    this.selectedCurrency,
+    this.cryptoCurrency,
+  });
+
+  final String value;
+  final String selectedCurrency;
+  final String cryptoCurrency;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+      child: Card(
+        color: Colors.lightBlueAccent,
+        elevation: 5.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+          child: Text(
+            '1 $cryptoCurrency = $value $selectedCurrency',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 20.0,
+              color: Colors.white,
+            ),
+          ),
+        ),
       ),
     );
   }
